@@ -1,0 +1,22 @@
+<ion-content padding>
+  <!-- <ion-button expand="block" (click)="sendToClipboard()">Send to Clipboard</ion-button> -->
+  <ion-button expand="block" (click)="shareTwitter()" *ngIf="isTwitterOk">Share on Twitter</ion-button>
+  <ion-button expand="block" (click)="shareEmail()" *ngIf="isEmailOk">Share by Email</ion-button>
+  <ion-button expand="block" (click)="shareFacebook()" *ngIf="isFacebookOk">Share on Facebook</ion-button>
+  <ion-button expand="block" (click)="shareWhatsApp()" *ngIf="isWhatsAppOk">Share with WhatsApp</ion-button>
+
+  <div *ngIf="!isTwitterOk && !isEmailOk && !isFacebookOk && !isWhatsAppOk">
+    <h2>Total files: {{items.torrents.length + items.subtitles.length}}</h2>
+
+    <h6>Torrents:</h6>
+    <p *ngFor="let item of items.torrents">
+      <a [href]="item">{{item}}</a>
+    </p>
+
+    <h6>Subtitles:</h6>
+    <p *ngFor="let item of items.subtitles">
+      <a [href]="item">{{item}}</a>
+    </p>
+  </div>
+
+</ion-content>
