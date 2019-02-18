@@ -11,6 +11,7 @@ Neste projeto vamos conhecer/estudar as seguintes tecnologias/ferramentas:
 * [Cordova](https://cordova.apache.org/);
 * [Ionic](https://ionicframework.com/);
 * [npm, o gerenciador de pacotes do Node.js](https://www.npmjs.com/);
+* [TypeScript](https://www.typescriptlang.org);
 * [Angular](https://angular.io/);
 * [ReactiveX, veremos o Rx.js](http://reactivex.io/);
 * [Underscore.js](https://underscorejs.org/);
