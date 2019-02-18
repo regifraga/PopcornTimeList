@@ -13,7 +13,8 @@ Neste projeto vamos conhecer/estudar as seguintes tecnologias/ferramentas:
 * [npm, o gerenciador de pacotes do Node.js](https://www.npmjs.com/);
 * [Angular](https://angular.io/);
 * [ReactiveX, veremos o Rx.js](http://reactivex.io/);
-* [Underscore.js](https://underscorejs.org/).
+* [Underscore.js](https://underscorejs.org/);
+* [Visual Studio Code](https://code.visualstudio.com/).
 
 ### Preparando o ambiente
 
@@ -22,7 +23,8 @@ Para termos o ambiente pronto para os nossos estudos, teremos que instalar as se
 * [Skype](https://www.skype.com/pt-br/get-skype/);
 * [Git](https://git-scm.com/);
 * [Node.js](https://nodejs.org/en/);
-* [Postman](https://www.getpostman.com/).
+* [Postman](https://www.getpostman.com/);
+* [Visual Studio Code](https://code.visualstudio.com/) ou o Editor de sua preferência.
 
 ### Instalações
 
