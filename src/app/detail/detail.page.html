@@ -11,9 +11,10 @@
     <ion-card>
       <ion-img [src]="selectedMovie.imageBigUrl" slot="start"></ion-img>
       <ion-card-header>
-        <ion-card-title><ion-badge style="float: left;" [color]="selectedMovie.ratingColor">{{selectedMovie.rating}}</ion-badge> {{selectedMovie.title}}</ion-card-title>
+        <ion-card-title><ion-badge [color]="selectedMovie.ratingColor">{{selectedMovie.rating}}</ion-badge> {{selectedMovie.title}}</ion-card-title>
         <ion-card-subtitle>{{selectedMovie.year}} <span>-</span> {{selectedMovie.runtime}} <span>-</span> {{selectedMovie.quality}}</ion-card-subtitle>
         <ion-card-subtitle>{{selectedMovie.genres}}</ion-card-subtitle>
+        <ion-card-subtitle>{{selectedMovie.actors}}</ion-card-subtitle>
       </ion-card-header>
     
       <ion-card-content>
