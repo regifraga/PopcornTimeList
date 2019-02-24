@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IonInfiniteScroll, NavController } from '@ionic/angular';
+import { IonInfiniteScroll, NavController, LoadingController, IonContent } from '@ionic/angular';
 import { NavigationExtras } from '@angular/router';
 
 import * as _ from 'underscore';
@@ -12,18 +12,69 @@ import * as _ from 'underscore';
 })
 export class ListPage implements OnInit {
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
+  @ViewChild(IonContent) pageTop: IonContent;
 
-  public page = 1;
+  private loading: any;
   private selectedMovie: any;
+  public searchTerm: string;
+  public page = 1;
   public movies: Array<{ id: number; imdb: string; title: string; imageUrl: string; imageBigUrl: string; description: string; year: number; quality: string; rating: number; genres: string; items: any; ratingColor: string; runtime: string, trailer: string }> = [];
 
-  constructor(private http: HttpClient, private navCtrl: NavController) {
+  constructor(
+    private http: HttpClient,
+    private navCtrl: NavController,
+    public loadingCtrl: LoadingController
+  ) {
     this.loadMovies();
   }
 
-  loadMovies(callback?) {
+
+  public pageScroller(){
+    this.pageTop.scrollToTop();
+  }
+
+  clearFilter() {
+    this.searchTerm = '';
+    this.loadMovies();
+  }
+
+  filterMovies(event) {
+    if (!this.searchTerm || this.searchTerm.length <= 3) {
+      return;
+    }
+
+    console.log(this.searchTerm);
+    //console.dir(event);
+
+    //_.debounce(async function() {
+      this.loadMovies(this.searchTerm);
+    //}, 500);
+  }
+
+  refresh(event) {
+    this.loadMovies(undefined, function() {
+      event.target.complete();
+    });
+  }
+
+  async loadMovies(keywords?, callback?) {
+    const loading = await this.loadingCtrl.create({
+      spinner: 'crescent',
+      message: 'Loading...',
+    });
+
+    loading.present();
+
     let self = this;
-    let url = 'http://api.apiumadomain.xyz/list?cb=0.4723313860962022&sort=seeds&quality=720p,1080p,4k&app_id=T4P_AND&os=ANDROID&ver=2.8.0&page=' + this.page;
+    let searchParam = (keywords) ? '&keywords=' + keywords.trim().replace(new RegExp(' ', 'g'), '_') : '';
+
+    if(searchParam) {
+      self.page = 1;
+    }
+
+    let url = 'http://api.apiumadomain.xyz/list?cb=0.4723313860962022&sort=seeds' + searchParam + '&quality=720p,1080p,4k&app_id=T4P_AND&os=ANDROID&ver=2.8.0&page=' + this.page;
+
+    console.log(url);
 
     self.http.get(url).subscribe((response) => {
       let movieList = [];
@@ -38,7 +89,6 @@ export class ListPage implements OnInit {
 
       for (let i = 0; i < movieList.length; i++) {
         let qualityList = [];
-        //let torrentList = [];
         
         let torrentList = _.chain(movieList[i].items).sortBy('size_bytes').map(function(item) {
           qualityList.push(item.quality);
@@ -75,19 +125,28 @@ export class ListPage implements OnInit {
 
       self.page++;
 
+      loading.dismiss();
+
       if (callback) {
           callback(self.movies);
       }
     });
   }
 
-  selectMovie(movie: any) {
+  async selectMovie(movie: any) {
+    const loadingDetail = await this.loadingCtrl.create({
+      spinner: 'crescent',
+      message: 'Loading...',
+    });
+
+    loadingDetail.present();
+  const self = this;
     this.selectedMovie = movie;
 
     //get subtitles
     let subtitleUrl = 'http://sub.apiumadomain.xyz/list?imdb=' + movie.imdb;
 
-    this.http.get(subtitleUrl).subscribe((response) => {
+    this.http.get(subtitleUrl).subscribe(async (response) => {
       movie.subtitles = {
         pt_br: [],
         pt: []
@@ -113,7 +172,9 @@ export class ListPage implements OnInit {
         }
       }
     
-      this.navCtrl.navigateForward(['/detail', movie.imdb], navigationExtras);
+      this.navCtrl.navigateForward(['/detail', movie.imdb], navigationExtras).finally(function() {
+        loadingDetail.dismiss();
+      });
     });
   }
 
@@ -125,7 +186,7 @@ export class ListPage implements OnInit {
 
   loadMore(event) {
     setTimeout(() => {
-      this.loadMovies(function(movies){
+      this.loadMovies(undefined, function(movies){
         console.log('Movies loaded: ' + movies.length);
 
         // App logic to determine if all data is loaded

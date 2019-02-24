@@ -11,13 +11,30 @@
     <ion-card>
       <ion-img [src]="selectedMovie.imageBigUrl" slot="start"></ion-img>
       <ion-card-header>
-        <ion-card-title><ion-badge [color]="selectedMovie.ratingColor">{{selectedMovie.rating}}</ion-badge> {{selectedMovie.title}}</ion-card-title>
+        <ion-card-title><ion-badge style="float: left;" [color]="selectedMovie.ratingColor">{{selectedMovie.rating}}</ion-badge> {{selectedMovie.title}}</ion-card-title>
         <ion-card-subtitle>{{selectedMovie.year}} <span>-</span> {{selectedMovie.runtime}} <span>-</span> {{selectedMovie.quality}}</ion-card-subtitle>
         <ion-card-subtitle>{{selectedMovie.genres}}</ion-card-subtitle>
       </ion-card-header>
     
       <ion-card-content>
-        {{selectedMovie.description}}
+        <p>{{selectedMovie.description}}</p>
+        <br/>
+        <p>
+          <ion-chip *ngIf="selectedMovie.subtitles.pt_br && selectedMovie.subtitles.pt_br.length > 0">
+              <ion-avatar>
+                <img src="../../assets/icon/flags/br.svg">
+              </ion-avatar>
+              <ion-label>pt-br</ion-label>
+              <!-- <ion-icon name="close-circle"></ion-icon> -->
+          </ion-chip>
+          <ion-chip *ngIf="selectedMovie.subtitles.pt && selectedMovie.subtitles.pt.length > 0">
+              <ion-avatar>
+                <img src="../../assets/icon/flags/pt.svg">
+              </ion-avatar>
+              <ion-label>pt</ion-label>
+              <!-- <ion-icon name="close-circle"></ion-icon> -->
+          </ion-chip>
+        </p>
       </ion-card-content>
 
       <ion-list>

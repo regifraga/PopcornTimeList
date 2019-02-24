@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, PopoverController } from '@ionic/angular';
+import { NavController, PopoverController, LoadingController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 
 import { ShareComponent } from '../share/share.component';
@@ -20,6 +20,7 @@ export class DetailPage implements OnInit {
     private navCtrl: NavController,
     private route: ActivatedRoute,
     public popoverController: PopoverController,
+    public loadingCtrl: LoadingController
   ) {
   }
   
