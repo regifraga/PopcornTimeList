@@ -1,39 +1,59 @@
-<ion-header>
+<ion-header (click)="pageScroller()">
   <ion-toolbar>
+    <!-- <ion-title start>List</ion-title> -->
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>
-      List
-    </ion-title>
+
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionInput)="filterMovies($event)"
+      (ionClear)="clearFilter()"
+      (ionCancel)="clearFilter()"
+      placeholder="Type here..."
+      debounce="500"
+      showCancelButton="true">
+    </ion-searchbar>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="showFilters()" >
+        <ion-icon name="funnel"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="showSortBy()" >
+        <ion-icon name="list"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <ion-refresher (ionRefresh)="refresh($event)" [pullMin]=90>
+      <ion-refresher-content
+         pullingIcon="arrow-dropdown"
+         pullingText="Pull to refresh"
+         refreshingSpinner="circles"
+         refreshingText="Refreshing...">
+      </ion-refresher-content>
+   </ion-refresher> 
+  
   <ion-list>
-    <!-- <ion-item *ngFor="let movie of movies" [routerLink]="['/detail', movie.imdb]" routerDirection="forward" (click)="selectMovie(movie)"> -->
-    <ion-item *ngFor="let movie of movies" (click)="selectMovie(movie)" style="cursor: pointer;">
-      <ion-thumbnail slot="start">
-        <ion-img [src]="movie.imageUrl"></ion-img>
-      </ion-thumbnail>
-      <ion-label>
-        <h2><strong>{{movie.title}}</strong></h2>
-        <h6><ion-badge [color]="movie.ratingColor" style="zoom: 0.80;">{{movie.rating}}</ion-badge> <span> {{movie.year}} {{movie.quality}} </span></h6>
-        <p>{{movie.description}}</p>
-      </ion-label>
-    </ion-item>
+      <ion-item button *ngFor="let movie of movies" (click)="selectMovie(movie)">
+          <ion-thumbnail slot="start">
+            <ion-img [src]="movie.imageUrl"></ion-img>
+          </ion-thumbnail>
+          <ion-label>
+            <h2><strong>{{movie.title}}</strong></h2>
+            <h6><ion-badge [color]="movie.ratingColor" style="zoom: 0.80;">{{movie.rating}}</ion-badge> <span> {{movie.year}} {{movie.quality}} </span></h6>
+            <p>{{movie.description}}</p>
+          </ion-label>
+      </ion-item >
   </ion-list>
 
-  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll *ngIf="!searchTerm || searchTerm.length === 0" threshold="100px" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Loading more data...">
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>
-
-  <!--
-    <div *ngIf="selectedItem" padding>
-      You navigated here from <b>{{selectedItem.title }}</b>
-    </div>
-  -->
 </ion-content>
