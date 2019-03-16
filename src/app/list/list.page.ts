@@ -12,6 +12,9 @@ import { ActionSheetButton } from "@ionic/core";
 
 import * as _ from "underscore";
 
+import { Movie } from "../movie";
+import { MovieService } from "../movie.service";
+
 let genresActionSheetButton: Array<ActionSheetButton> = [];
 let sortByListActionSheetButton: Array<ActionSheetButton> = [];
 
@@ -30,112 +33,17 @@ export class ListPage implements OnInit {
   public genre: string;
   public sortBy: string;
   public page = 1;
-  public movies: Array<{
-    id: number;
-    imdb: string;
-    title: string;
-    actors: string;
-    imageUrl: string;
-    imageBigUrl: string;
-    description: string;
-    year: number;
-    quality: string;
-    rating: number;
-    genres: string;
-    items: any;
-    ratingColor: string;
-    runtime: string;
-    trailer: string;
-  }> = [];
+  public movies: Array<Movie> = [];
   private genres: Array<string>;
   private sortByList: Array<string>;
 
   constructor(
+    private movieService: MovieService,
     private http: HttpClient,
     private navCtrl: NavController,
     public loadingCtrl: LoadingController,
     private actionSheetCtrl: ActionSheetController
-  ) {
-    const self = this;
-    const actionSheetCancelButton = {
-      text: "Cancel",
-      icon: "close",
-      role: "cancel",
-      handler: () => {
-        console.log("Cancel clicked");
-      }
-    };
-
-    this.sortByList = ["Popularity", "Date added", "Year"];
-
-    _.each(this.sortByList, function(sortBy) {
-      sortByListActionSheetButton.push({
-        text: sortBy,
-        icon: undefined,
-        role: undefined,
-        handler: () => {
-          console.log(sortBy);
-          self.searchTerm = "";
-          self.movies = [];
-          self.page = 1;
-          self.sortBy = sortBy;
-          self.loadMovies();
-        }
-      });
-    });
-
-    sortByListActionSheetButton.push(actionSheetCancelButton);
-
-    this.genres = [
-      "All",
-      "Action",
-      "Adventure",
-      "Animation",
-      "Biography",
-      "Comedy",
-      "Crime",
-      "Documentary",
-      "Drama",
-      "Family",
-      "Fantasy",
-      "Film-Noir",
-      "History",
-      "Horror",
-      "Music",
-      "Musical",
-      "Mystery",
-      "Romance",
-      "Sci-Fi",
-      "Short",
-      "Sport",
-      "Thriller",
-      "War",
-      "Western"
-    ];
-
-    _.each(this.genres, function(genre) {
-      genresActionSheetButton.push({
-        text: genre,
-        icon: undefined,
-        role: undefined,
-        handler: () => {
-          console.log(genre);
-          self.searchTerm = "";
-          self.movies = [];
-          self.page = 1;
-          self.genre = genre;
-          self.loadMovies();
-        }
-      });
-    });
-
-    genresActionSheetButton.push(actionSheetCancelButton);
-
-    this.genre = this.genres[0];
-    this.sortBy = this.sortByList[0];
-
-    this.loadMovies();
-  }
+  ) {}
 
   public pageScroller() {
     this.pageTop.scrollToTop();
@@ -225,72 +133,9 @@ export class ListPage implements OnInit {
       "&quality=720p,1080p,4k&app_id=T4P_AND&os=ANDROID&ver=2.8.0&page=" +
       this.page;
 
-    console.log(url);
+    this.movies = this.movieService.getMovies(url, callback, loading);
 
-    self.http.get(url).subscribe(response => {
-      let movieList = [];
-
-      try {
-        if (response.hasOwnProperty("MovieList")) {
-          movieList = response["MovieList"];
-        }
-      } catch (error) {}
-
-      for (let i = 0; i < movieList.length; i++) {
-        let qualityList = [];
-
-        let torrentList = _.chain(movieList[i].items)
-          .sortBy("size_bytes")
-          .map(function(item) {
-            qualityList.push(item.quality);
-
-            return {
-              quality: item.quality,
-              size_bytes: self.humanFileSize(item.size_bytes, 2),
-              torrent_peers: item.torrent_peers,
-              torrent_seeds: item.torrent_seeds,
-              torrent_magnet: item.torrent_magnet,
-              isChecked: false
-            };
-          })
-          .value();
-
-        qualityList = _.intersection(qualityList);
-
-        self.movies.push({
-          id: movieList[i].id,
-          imdb: movieList[i].imdb,
-          title: movieList[i].title,
-          actors: movieList[i].actors,
-          imageUrl: movieList[i].poster_med,
-          imageBigUrl: movieList[i].poster_big,
-          description: movieList[i].description,
-          year: movieList[i].year,
-          quality: qualityList.join(", "),
-          rating: movieList[i].rating,
-          genres: movieList[i].genres.join(", "),
-          items: torrentList,
-          ratingColor:
-            +movieList[i].rating >= 9
-              ? "primary"
-              : +movieList[i].rating >= 6
-              ? "success"
-              : +movieList[i].rating > 4
-              ? "warning"
-              : "danger",
-          runtime: movieList[i].runtime.toString() + " min",
-          trailer: movieList[i].trailer
-        });
-      }
-
-      self.page++;
-
-      loading.dismiss();
-
-      if (callback) {
-        callback(self.movies);
-      }
-    });
+    loading.dismiss();
   }
 
   async selectMovie(movie: any) {
@@ -375,5 +220,85 @@ export class ListPage implements OnInit {
     return parseFloat((size / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    let self = this;
+    const actionSheetCancelButton = {
+      text: "Cancel",
+      icon: "close",
+      role: "cancel",
+      handler: () => {
+        console.log("Cancel clicked");
+      }
+    };
+
+    this.sortByList = ["Popularity", "Date added", "Year"];
+
+    _.each(this.sortByList, function(sortBy) {
+      sortByListActionSheetButton.push({
+        text: sortBy,
+        icon: undefined,
+        role: undefined,
+        handler: () => {
+          console.log(sortBy);
+          self.searchTerm = "";
+          self.movies = [];
+          self.page = 1;
+          self.sortBy = sortBy;
+          self.loadMovies();
+        }
+      });
+    });
+
+    sortByListActionSheetButton.push(actionSheetCancelButton);
+
+    this.genres = [
+      "All",
+      "Action",
+      "Adventure",
+      "Animation",
+      "Biography",
+      "Comedy",
+      "Crime",
+      "Documentary",
+      "Drama",
+      "Family",
+      "Fantasy",
+      "Film-Noir",
+      "History",
+      "Horror",
+      "Music",
+      "Musical",
+      "Mystery",
+      "Romance",
+      "Sci-Fi",
+      "Short",
+      "Sport",
+      "Thriller",
+      "War",
+      "Western"
+    ];
+
+    _.each(this.genres, function(genre) {
+      genresActionSheetButton.push({
+        text: genre,
+        icon: undefined,
+        role: undefined,
+        handler: () => {
+          console.log(genre);
+          self.searchTerm = "";
+          self.movies = [];
+          self.page = 1;
+          self.genre = genre;
+          self.loadMovies();
+        }
+      });
+    });
+
+    genresActionSheetButton.push(actionSheetCancelButton);
+
+    this.genre = this.genres[0];
+    this.sortBy = this.sortByList[0];
+
+    this.loadMovies();
+  }
 }
