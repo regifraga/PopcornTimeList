@@ -97,13 +97,6 @@ export class ListPage implements OnInit {
   }
 
   async loadMovies(callback?) {
-    const loading = await this.loadingCtrl.create({
-      spinner: "crescent",
-      message: "Loading..."
-    });
-
-    loading.present();
-
     let self = this;
     const searchParam = this.searchTerm
       ? "&keywords=" + this.searchTerm.trim().replace(new RegExp(" ", "g"), "+")
@@ -133,9 +126,9 @@ export class ListPage implements OnInit {
       "&quality=720p,1080p,4k&app_id=T4P_AND&os=ANDROID&ver=2.8.0&page=" +
       this.page;
 
-    this.movies = this.movieService.getMovies(url, callback, loading);
+    this.movies = this.movieService.getMovies(url, callback);
 
-    loading.dismiss();
+    self.page++;
   }
 
   async selectMovie(movie: any) {
@@ -143,20 +136,17 @@ export class ListPage implements OnInit {
       spinner: "crescent",
       message: "Loading..."
     });
-
     loadingDetail.present();
-    const self = this;
     this.selectedMovie = movie;
 
     //get subtitles
     let subtitleUrl = "http://sub.apiumadomain.xyz/list?imdb=" + movie.imdb;
 
-    this.http.get(subtitleUrl).subscribe(async response => {
+    this.movieService.getSubtitles(subtitleUrl).subscribe(async response => {
       movie.subtitles = {
         pt_br: [],
         pt: []
       };
-
       try {
         if (response.hasOwnProperty("subs")) {
           movie.subtitles.pt_br = _.chain(response["subs"]["pb"])
@@ -207,17 +197,6 @@ export class ListPage implements OnInit {
 
       event.target.complete();
     }, 500);
-  }
-
-  humanFileSize(size, decimalPoint) {
-    if (size == 0) return "0 Bytes";
-
-    let k = 1000,
-      dm = decimalPoint || 2,
-      sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(size) / Math.log(k));
-
-    return parseFloat((size / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
 
   ngOnInit() {

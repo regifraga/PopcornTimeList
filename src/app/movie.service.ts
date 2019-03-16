@@ -3,20 +3,37 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 
+import { LoadingController } from "@ionic/angular";
+
 import { Movie } from "./movie";
 import { Util } from "./util";
 import * as _ from "underscore";
+import { load } from "@angular/core/src/render3";
+import { Subtitle } from "./subtitle";
 
 @Injectable({
   providedIn: "root"
 })
 export class MovieService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    public loadingCtrl: LoadingController
+  ) {}
 
-  getMovies(url: string, callback?: any, loading?: any): Movie[] {
+  getSubtitles(url: string): Observable<Subtitle> {
+    return this.http.get<Subtitle>(url);
+  }
+  getMovies(url: string, callback?: any): Movie[] {
     const movies: Array<Movie> = [];
-    // let movies =[];
-    this.http.get<Movie[]>(url).subscribe(response => {
+
+    this.http.get<Movie[]>(url).subscribe(async response => {
+      const loading = await this.loadingCtrl.create({
+        spinner: "crescent",
+        message: "Loading..."
+      });
+
+      loading.present();
+
       let movieList = [];
 
       try {
@@ -70,8 +87,9 @@ export class MovieService {
           trailer: movieList[i].trailer
         });
       }
+
+      await loading.dismiss();
       // this.page++;
-      loading.dismiss();
       if (callback) {
         callback(movies);
       }

@@ -1,3 +1,5 @@
+import { Subtitle } from "./subtitle";
+
 export class Movie {
   id: number;
   imdb: string;
@@ -14,4 +16,5 @@ export class Movie {
   ratingColor: string;
   runtime: string;
   trailer: string;
+  subtitles: Subtitle;
 }
