@@ -33,7 +33,7 @@ Instale o Git, Node.js e o Postman.
 
 #### Instalando o Ionic e o Cordova
 
-O Ionic usa o [Apache Cordova](https://cordova.apache.org/) para a integração com o Hardware, por tanto devemos instalar este também. Para isto utilizaremos o npm (gerenciador de pacotes do Node.js)
+O Ionic usa o [Apache Cordova](https://cordova.apache.org/) para a integração com o Hardware, portanto devemos instalar este também. Para isto utilizaremos o npm (gerenciador de pacotes do Node.js)
 
 ```sh
 npm install -g cordova
